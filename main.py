@@ -1,9 +1,9 @@
-from flask import Flask, render_template, request, send_file, redirect, url_for
+from flask import Flask, render_template, request, send_file, jsonify, redirect, url_for
 from transcriber import transcrever_audio
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import os, json, uuid
-from flask import jsonify
+import speech_recognition as sr
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
@@ -72,8 +72,6 @@ def ao_vivo():
 
 @app.route('/transcrever', methods=['POST'])
 def transcrever_microfone():
-    import speech_recognition as sr
-
     reconhecedor = sr.Recognizer()
     try:
         with sr.Microphone() as fonte:
@@ -87,4 +85,4 @@ def transcrever_microfone():
         return jsonify({"texto": f"Erro: {str(e)}"})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

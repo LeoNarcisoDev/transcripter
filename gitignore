@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+uploads/
+historico.json
+*.wav
+*.mp3
+*.ogg
+.idea/
+.DS_Store
