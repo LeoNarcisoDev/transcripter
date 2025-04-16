@@ -3,6 +3,7 @@ from transcriber import transcrever_audio
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import os, json, uuid
+from flask import jsonify
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
@@ -64,6 +65,26 @@ def baixar_transcricao(id):
                 f.write(f"Tradução para pt-BR:\n{registro['traducao']}")
             return send_file(caminho_txt, as_attachment=True)
     return "Transcrição não encontrada", 404
+
+@app.route('/ao-vivo')
+def ao_vivo():
+    return render_template('ao_vivo.html')
+
+@app.route('/transcrever', methods=['POST'])
+def transcrever_microfone():
+    import speech_recognition as sr
+
+    reconhecedor = sr.Recognizer()
+    try:
+        with sr.Microphone() as fonte:
+            reconhecedor.adjust_for_ambient_noise(fonte)
+            audio = reconhecedor.listen(fonte)
+            texto = reconhecedor.recognize_google(audio, language="pt-BR")
+            return jsonify({"texto": texto})
+    except sr.UnknownValueError:
+        return jsonify({"texto": "🤔 Não entendi o que foi dito."})
+    except Exception as e:
+        return jsonify({"texto": f"Erro: {str(e)}"})
 
 if __name__ == '__main__':
     app.run(debug=True)
