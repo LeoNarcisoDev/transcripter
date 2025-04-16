@@ -1,35 +1,27 @@
 import os
-import speech_recognition as sr
-import pydub
+import whisper
+from datetime import datetime
+from deep_translator import GoogleTranslator
 
-# Força explicitamente o caminho do ffmpeg para o pydub
-pydub.AudioSegment.converter = r"C:\Users\leoon\Documents\ffmpeg-7.1.1-full_build\bin\ffmpeg.exe"
-from pydub import AudioSegment  # só importa depois de setar o converter
+model = whisper.load_model("base")  # pode usar "small", "medium" ou "large"
 
-def transcrever_audio(caminho_audio, idioma='pt-BR'):
-    reconhecedor = sr.Recognizer()
-    caminho_wav = caminho_audio
-
-    # Converter para WAV se necessário
-    if not caminho_audio.endswith('.wav'):
-        audio = AudioSegment.from_file(caminho_audio)
-        caminho_wav = caminho_audio.rsplit('.', 1)[0] + '.wav'
-        audio.export(caminho_wav, format='wav')
-
+def transcrever_audio(caminho_audio, idioma='pt'):
     try:
-        with sr.AudioFile(caminho_wav) as fonte:
-            audio = reconhecedor.record(fonte)
+        resultado = model.transcribe(caminho_audio)
 
-        texto = reconhecedor.recognize_google(audio, language=idioma)
-        return texto
+        texto = resultado['text'].strip()
+        idioma_detectado = resultado['language']
 
-    except sr.UnknownValueError:
-        return "Não foi possível entender o áudio."
-    except sr.RequestError:
-        return "Erro ao acessar o serviço de reconhecimento."
+        # Traduz para português se não for pt
+        if idioma_detectado != 'pt':
+            traducao = GoogleTranslator(source=idioma_detectado, target="pt").translate(texto)
+        else:
+            traducao = texto
 
+        return texto, traducao
+
+    except Exception as e:
+        return f"[Erro na transcrição: {e}]", ""
     finally:
         if os.path.exists(caminho_audio):
             os.remove(caminho_audio)
-        if caminho_wav != caminho_audio and os.path.exists(caminho_wav):
-            os.remove(caminho_wav)

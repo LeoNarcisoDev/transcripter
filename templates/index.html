@@ -29,19 +29,21 @@
 
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary">Converter</button>
+                <a href="{{ url_for('ver_historico') }}" class="btn btn-secondary">Ver Histórico</a>
             </div>
         </form>
 
-        {% if texto %}
+        {% if texto_original %}
         <div class="mt-5">
-            <h4 class="text-success">Resultado da Transcrição:</h4>
-            <textarea class="form-control" rows="10">{{ texto }}</textarea>
+            <h4 class="text-primary">Texto Original (Idioma Selecionado):</h4>
+            <textarea class="form-control mb-3" rows="6" readonly>{{ texto_original }}</textarea>
+        </div>
+        {% endif %}
 
-            <div class="mt-3">
-                <a href="{{ url_for('download_txt') }}" class="btn btn-outline-success" download="transcricao.txt">
-                    Baixar como .txt
-                </a>
-            </div>
+        {% if traducao and traducao != texto_original %}
+        <div class="mt-3">
+            <h4 class="text-success">Tradução para Português:</h4>
+            <textarea class="form-control" rows="6" readonly>{{ traducao }}</textarea>
         </div>
         {% endif %}
     </div>
