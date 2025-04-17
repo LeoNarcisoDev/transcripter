@@ -1,11 +1,6 @@
-__pycache__/
-*.pyc
-.env
-.venv/
-uploads/
+realtime.py
+templates/ao_vivo.html
 historico.json
-*.wav
-*.mp3
-*.ogg
-.idea/
-.DS_Store
+uploads/
+.venv/
+__pycache__/
