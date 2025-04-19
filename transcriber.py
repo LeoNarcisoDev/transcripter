@@ -1,28 +1,26 @@
-import os
 import whisper
-from datetime import datetime
 from deep_translator import GoogleTranslator
+import os
 
-model = whisper.load_model("tiny")
-  # pode usar "small", "medium" ou "large"
-
-def transcrever_audio(caminho_audio, idioma='pt'):
+def transcrever_audio(caminho_arquivo, idioma='pt'):
     try:
-        resultado = model.transcribe(caminho_audio)
+        # Carregar o modelo apenas quando a função for chamada (economiza memória)
+        model = whisper.load_model("tiny")  # modelos: tiny, base, small, medium, large
 
-        texto = resultado['text'].strip()
-        idioma_detectado = resultado['language']
+        # Executa a transcrição
+        resultado = model.transcribe(caminho_arquivo, language=idioma)
 
-        # Traduz para português se não for pt
-        if idioma_detectado != 'pt':
-            traducao = GoogleTranslator(source=idioma_detectado, target="pt").translate(texto)
+        texto = resultado["text"].strip()
+
+        # Tradução para português BR (se necessário)
+        if idioma != "pt" and texto:
+            translator = GoogleTranslator(source=idioma, target="pt")
+            traducao = translator.translate(texto)
         else:
-            traducao = texto
+            traducao = texto  # já está em pt
 
         return texto, traducao
 
     except Exception as e:
-        return f"[Erro na transcrição: {e}]", ""
-    finally:
-        if os.path.exists(caminho_audio):
-            os.remove(caminho_audio)
+        print(f"[ERRO] Falha na transcrição: {e}")
+        return "Erro ao transcrever", "Erro ao traduzir"
