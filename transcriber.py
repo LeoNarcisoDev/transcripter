@@ -3,7 +3,8 @@ import whisper
 from datetime import datetime
 from deep_translator import GoogleTranslator
 
-model = whisper.load_model("base")  # pode usar "small", "medium" ou "large"
+model = whisper.load_model("tiny")
+  # pode usar "small", "medium" ou "large"
 
 def transcrever_audio(caminho_audio, idioma='pt'):
     try:
